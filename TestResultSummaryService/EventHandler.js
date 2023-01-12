@@ -53,7 +53,7 @@ class EventHandler {
             logger.verbose(
                 `EventHandler: processBuild() is waiting for ${elapsedTime} secs before checking DB for builds != Done`
             );
-            await Promise.delay(elapsedTime * 1000);
+            await Promise.delay(30 * 1000); //was this delay(elapsedTime * 1000), but i changed it for now to make testing faster
         }
     }
 
@@ -91,7 +91,7 @@ class EventHandler {
             logger.verbose(
                 `EventHandler: monitorBuild() is waiting for ${elapsedTime} secs`
             );
-            await Promise.delay(elapsedTime * 1000);
+            await Promise.delay(30 * 1000); //was this delay(elapsedTime * 1000), but i changed it for now to make testing faster
         }
     }
 }
