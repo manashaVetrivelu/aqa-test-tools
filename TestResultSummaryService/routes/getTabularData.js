@@ -5,11 +5,11 @@ function exceedDate(jdkDate) {
         if (element.sdkResource == "releases") {
             return parseInt(parseTimestamp(element.timestamp)) <= parseInt(jdkDate);
         } else {
-            let re = /(Temurin)-([^-]+)-(\d{8})/;
+            let re = /(Compressed References)\s(\d{8})/;
             let javaVersion = element.javaVersion.match(re);
 
             if (javaVersion) {
-                correctDate = javaVersion[3];
+                correctDate = javaVersion[2];
                 return parseInt(correctDate) <= parseInt(jdkDate);
             } else {
                 return parseInt(element.jdkDate) <= parseInt(jdkDate);
@@ -109,11 +109,11 @@ module.exports = async (req, res) => {
                 if (exceedFilter[index].sdkResource == "releases") {
                 }
                 else {
-                    let re = /(Temurin)-([^-]+)-(\d{8})/;
+                    let re = /(Compressed References)\s(\d{8})/;
                     let javaVersion = element.javaVersion.match(re);
                     console.log( `Show me: ${exceedFilter[index].sdkResource}, ${javaVersion}, ` );
                     if (javaVersion) {
-                        correctDate = javaVersion[3];
+                        correctDate = javaVersion[2];
                         exceedFilter[index].jdkDate = correctDate;
                     }
                 }

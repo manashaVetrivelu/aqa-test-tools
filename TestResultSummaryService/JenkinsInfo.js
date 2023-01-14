@@ -2,7 +2,7 @@ const Promise = require('bluebird');
 const jenkinsapi = require('jenkins-api');
 const { logger, addCredential } = require('./Utils');
 const ArgParser = require('./ArgParser');
-const BuildOutputStream = require('./BuildOutputStream');
+const LogStream = require('./LogStream');
 
 const options = { request: { timeout: 30000 } };
 
@@ -42,39 +42,21 @@ class JenkinsInfo {
         return builds;
     }
 
+
     async getBuildOutput(url, buildName, buildNum) {
         logger.info('JenkinsInfo: getBuildOutput: ', url, buildName, buildNum);
-        const logStream = new BuildOutputStream({
+        const logStream = new LogStream({
             baseUrl: url,
             job: buildName,
             build: buildNum,
         });
-        //going to comment out size just for now and see if that is the thing that is causing the problem. 
-        //const size = await logStream.getSize();
-        //const size = 5242880; //just created a random size here
+
         logger.debug(
             'JenkinsInfo: getBuildOutput() is waiting for 5 secs after getSize()'
         );
         await Promise.delay(5 * 1000);
         
         return await logStream.getOutputText();
-        // Due to 1G string limit and possible OOM in CI server and/or TRSS, only query the output < 50M
-        // Regular output should be 2~3M. In rare cases, we get very large output
-        // ToDo: we need to update parser to handle segmented output
-        
-        //if (size > -1) {
-            //const limit = Math.floor(50 * 1024 * 1024);
-            //if (size < limit) {
-                //return await logStream.next(0);               
-            //} else {
-              //  logger.debug(
-                //    `JenkinsInfo: getBuildOutput(): Output size ${size} > size limit ${limit}`
-                //);
-                //throw `Output size ${size} > size limit ${limit}`;
-            //}
-        //} else {
-        //    throw `Cannot get build output size: ${size}`;
-        //}
     }
 
     async getBuildInfo(url, buildName, buildNum) {
