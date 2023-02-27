@@ -21,11 +21,11 @@ class DataManager {
         }
     }
 
-    async parseOutput(buildName, output) {
+    async parseOutput(buildName, output) { 
         const parserTypes = await Promise.all(
             Object.keys(Parsers).map(async (type) => {
                 if (Parsers[type].canParse(buildName, output)) {
-                    const parser = new Parsers[type](buildName);
+                    const parser = new Parsers[type](buildName); 
                     return await parser.parse(output);
                 }
             })
@@ -34,7 +34,7 @@ class DataManager {
             return element !== undefined;
         });
         if (results.length === 0) {
-            const parser = new DefaultParser();
+            const parser = new DefaultParser(buildName); //added buildName so it can find info about the build
             results = await parser.parse(output);
         }
         return Object.assign.apply({}, results);

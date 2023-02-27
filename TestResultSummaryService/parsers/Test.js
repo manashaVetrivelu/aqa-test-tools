@@ -13,8 +13,11 @@ class Test extends Parser {
         if (output) {
             if (buildName.indexOf('Test-') === 0) {
                 return true;
-            } else {
-                return output.includes('Running test ');
+            } else if (output.includes('Running test ')){
+                return true;
+            }
+            else {
+                return output.includes('openjdk_tests'); //for failed builds that don't even get to the Running test spot
             }
         } else {
             return false;
