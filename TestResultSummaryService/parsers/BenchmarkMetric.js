@@ -108,6 +108,18 @@ const BenchmarkMetricRegex = {
             },
         },
     },
+    'liberty-dt7': {
+        //Example: Warm run 0...
+        outerRegex: /Warm run \d*([\s\S\n]*)/,
+        metrics: {
+            Throughput: {
+                //Example: <metric type="throughput">\n<data machine="bottas10G" units="req/sec">533.592</data>
+                regex: /<metric type="throughput"[\s\S\n]*? units="req\/sec">(\d*\.?\d*)<\/data>/,
+                higherbetter: true,
+                units: 'req/sec',
+            },
+        },
+    },
     'liberty-throughput': {
         //Example: Running 1 measures...
         outerRegex: /Running \d* measures([\s\S\n]*)/,
