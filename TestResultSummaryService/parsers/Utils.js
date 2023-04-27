@@ -16,8 +16,10 @@ class Utils {
         let curBenchVariant = null;
         let curMetric = null;
         let curRegexResult = null;
+        let curRegexResultInner = null;
         let curMetricValues = null;
         let curRegex = null;
+        let currentTestOutput = null;
 
         if (
             !BenchmarkMetric[benchmarkParserkey] ||
@@ -43,12 +45,41 @@ class Utils {
                     testOutput = curRegexResult[1];
                 }
             }
+            if (curBenchVariant.innerRegex !== undefined){
+                if (
+                    (curRegexResult =
+                        curBenchVariant.innerRegex[Symbol.split](testOutput)) !== null
+                ) {
+                    // index 0 contains the text before the innerRegex
+                    testOutput = curRegexResult[0];
+                }
+            }
 
             // Parse metric values
             curTestData['metrics'] = [];
             let curMetricList = Object.keys(curBenchVariant['metrics']);
             for (let i = 0; i < curMetricList.length; i++) {
+                currentTestOutput = testOutput;
                 curMetric = curMetricList[i];
+                //seeing if the innerRegex is present inside the metric
+                if (curBenchVariant['metrics'][curMetric]['innerRegex'] !== undefined){
+                    if (
+                        (curRegexResultInner =
+                            curBenchVariant['metrics'][curMetric]['innerRegex'][Symbol.split](currentTestOutput)) !== null
+                    ) {
+                        // index 0 contains the text before the innerRegex
+                        currentTestOutput = curRegexResultInner[0];
+                    }
+                }
+                if (curBenchVariant['metrics'][curMetric]['outerRegex'] !== undefined){
+                    if (
+                        (curRegexResultInner =
+                            curBenchVariant['metrics'][curMetric]['outerRegex'].exec(currentTestOutput)) !== null
+                    ) {
+                        // index 1 contains the text after outerRegex
+                        currentTestOutput = curRegexResultInner[1];
+                    }
+                }
                 curRegex = curBenchVariant['metrics'][curMetric]['regex'];
                 /*	Parse all values for single metric from result to an array
                  *  e.g
@@ -57,7 +88,7 @@ class Utils {
                  *  Liberty Throughput =>
                  *  curRegexResult = ['<metric type="throughput">32<\/data>',32]
                  */
-                curRegexResult = testOutput.split(curRegex);
+                curRegexResult = currentTestOutput.split(curRegex);
                 //collect only the capture groups from the regex array
                 curRegexResult = curRegexResult.filter(
                     (value, index) => index % 2 === 1
