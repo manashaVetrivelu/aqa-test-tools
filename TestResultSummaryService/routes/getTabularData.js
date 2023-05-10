@@ -2,8 +2,37 @@ const { TestResultsDB, ObjectID } = require('../Database');
 
 function exceedDate(jdkDate) {
     return function (element) {
-        return parseInt(element.jdkDate) <= parseInt(jdkDate);
+        if (element.sdkResource == "releases") {
+            return parseInt(parseTimestamp(element.timestamp)) <= parseInt(jdkDate);
+        } else {
+            let re = /(Compressed References)\s(\d{8})/;
+            let javaVersion = element.javaVersion.match(re);
+
+            if (javaVersion) {
+                correctDate = javaVersion[2];
+                return parseInt(correctDate) <= parseInt(jdkDate);
+            } else {
+                return parseInt(element.jdkDate) <= parseInt(jdkDate);
+            }
+
+        }
+    }
+}
+
+function parseTimestamp(timestamp) {
+    const months = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
+    const date = new Date(timestamp);
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+    let dateString = "";
+
+    if (day.toString().length == 1) {
+        dateString = year.toString() + months[month] + '0' + day.toString();
+    } else {
+        dateString = year.toString() + months[month] + day.toString();
     };
+    return dateString;
 }
 
 module.exports = async (req, res) => {
@@ -75,16 +104,30 @@ module.exports = async (req, res) => {
 
             // Remove all entries whose build date exceeds the chosen date
             const exceedFilter = result.filter(exceedDate(req.query.jdkDate));
+            // Grab date from jdk version
+            exceedFilter.forEach(function(element, index, theArray) {
+                if (exceedFilter[index].sdkResource == "releases") {
+                }
+                else {
+                    let re = /(Compressed References)\s(\d{8})/;
+                    let javaVersion = element.javaVersion.match(re);
+                    console.log( `Show me: ${exceedFilter[index].sdkResource}, ${javaVersion}, ` );
+                    if (javaVersion) {
+                        correctDate = javaVersion[2];
+                        exceedFilter[index].jdkDate = correctDate;
+                    }
+                }
+              });
             // Setting the latest build date from the available dates
             const latestDate = Math.max.apply(
                 Math,
                 exceedFilter.map(function (o) {
-                    return parseInt(o.jdkDate);
+                    return parseInt(o.jdkDate.replace(/[\s()-]+/gi, ''));
                 })
             );
             // Remove all runs that are not the latest
             const dateFilter = exceedFilter.filter(
-                (entry) => parseInt(entry.jdkDate) === latestDate
+                (entry) => parseInt(entry.jdkDate.replace(/[\s()-]+/gi, '')) === latestDate
             );
             const latest = Math.max.apply(
                 Math,
@@ -97,9 +140,18 @@ module.exports = async (req, res) => {
                 return o.timestamp == latest;
             });
 
-            if (latestRun !== undefined) {
-                datas.push(latestRun);
+            if ((latestRun !== undefined)) {
+                let exists = false;
+                for (build in datas) {
+                    if ((datas[build].buildNum == latestRun.buildNum) && (datas[build].buildName == latestRun.buildName)) {
+                        exists = true;
+                    }
+                }
+                if (!exists) {
+                    datas.push( latestRun );
+                }
             }
+
         }
     }
     // Return the list of unique pipeline names for column generation

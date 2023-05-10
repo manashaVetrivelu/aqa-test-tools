@@ -90,7 +90,7 @@ const BenchmarkMetricRegex = {
             },
         },
     },
-    'liberty-dt7-startup': {
+    'liberty-startup': {
         //Example: Warm run 0...
         outerRegex: /Warm run \d*([\s\S\n]*)/,
         metrics: {
@@ -108,21 +108,70 @@ const BenchmarkMetricRegex = {
             },
         },
     },
-    'liberty-dt7-throughput': {
-        //Example: Running 1 measures...
-        outerRegex: /Running \d* measures([\s\S\n]*)/,
+    'liberty-throughput': {
+        outerRegex: /<run runNo="\d*" runType="measure"([\s\S\n]*)/,
         metrics: {
-            Footprint: {
-                //Example: Footprint (kb)=168940
+            'CPU Util pct': {
+                //we only keep track of first CPUutil
+                //Example: <metric type="CPU Utilization">\n<data machine="sevenup10G" units="%" cv="0.0">14.0</data>/n<data machine="bottas10G" units="%" cv="2.9951475130430323">15.3</data>
+                innerRegex: /Calculating Scenario Specific Statistics([\s\S\n]*)/,
+                regex: /<metric type="CPU Utilization">[\s\S\n]*?cv="\d*\.?\d*">\d*\.?\d*?<\/data>[\s\S\n]*?cv="\d*\.?\d*">(\d*\.?\d*)<\/data>/,
+                higherbetter: false,
+                units: '%',
+            },
+            Throughput: {
+                //Example: <metric type="throughput">\n<data machine="bottas10G" units="req/sec">533.592</data>
+                innerRegex: /Calculating Scenario Specific Statistics([\s\S\n]*)/,
+                regex: /<metric type="throughput"[\s\S\n]*? units="req\/sec">(\d*\.?\d*)<\/data>/,
+                higherbetter: true,
+                units: 'req/sec',
+            },
+            'JIT CPU total ms': {
+                //Example: #PERF:  Time spent in compilation thread =22323 ms
+                //JITCPUtotal is sum of all JIT CPU usage use values in verbose logs
+                innerRegex: /Throughput Benchmark has completed successfully([\s\S\n]*)/,
+                regex: /#PERF[\s\S\n]*?compilation thread =(\d*\.?\d*)[\s\S\n]*?/,
+                higherbetter: false,
+                units: '%',
+                funcName: math.sum,
+            },
+            'Adjusted Single Server Memory': {
+                //Example: Footprint (kb)=589444
+                innerRegex: /Stopping the Liberty Server([\s\S\n]*)/,
                 regex: /Footprint \(kb\)=(\d*\.?\d*)/,
                 higherbetter: false,
                 units: 'kb',
             },
-            Throughput: {
-                //Example: Page throughput = 2923.0 /s
-                regex: /Page throughput = (\d*\.?\d*)/,
+            'Warm CPU Util pct': {
+                //we only keep track of first CPUutil
+                //Example: <metric type="CPU Utilization">\n<data machine="sevenup10G" units="%" cv="0.0">14.0</data>/n<data machine="bottas10G" units="%" cv="2.9951475130430323">15.3</data>
+                outerRegex: /<run runNo="\d*" runType="measure"([\s\S\n]*)/,
+                regex: /<metric type="CPU Utilization">[\s\S\n]*?cv="\d*\.?\d*">\d*\.?\d*?<\/data>[\s\S\n]*?cv="\d*\.?\d*">(\d*\.?\d*)<\/data>/,
+                higherbetter: false,
+                units: '%',
+            },
+            ThroughputWarm: {
+                //Example: <metric type="throughput">\n<data machine="bottas10G" units="req/sec">533.592</data>
+                outerRegex: /<run runNo="\d*" runType="measure"([\s\S\n]*)/,
+                regex: /<metric type="throughput"[\s\S\n]*? units="req\/sec">(\d*\.?\d*)<\/data>/,
                 higherbetter: true,
                 units: 'req/sec',
+            },
+            'Warm JIT CPU total ms': {
+                //Example: #PERF:  Time spent in compilation thread =22323 ms
+                //JITCPUtotal is sum of all JIT CPU usage use values in verbose logs
+                outerRegex: /Throughput Benchmark has completed successfully([\s\S\n]*)/,
+                regex: /#PERF[\s\S\n]*?compilation thread =(\d*\.?\d*)[\s\S\n]*?/,
+                higherbetter: false,
+                units: '%',
+                funcName: math.sum,
+            },
+            'Warm Adjusted Single Server Memory': {
+                //Example: Footprint (kb)=589444
+                outerRegex: /Stopping the Liberty Server([\s\S\n]*)/,
+                regex: /Footprint \(kb\)=(\d*\.?\d*)/,
+                higherbetter: false,
+                units: 'kb',
             },
         },
     },

@@ -40,7 +40,6 @@
         "cy": "cypress open",
         "prettier": "npx prettier --write ."
     },
-    "proxy": "http://localhost:3001",
     "devDependencies": {
         "cypress": "^8.6.0",
         "prettier": "2.5.1"
