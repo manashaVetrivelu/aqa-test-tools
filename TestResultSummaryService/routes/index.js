@@ -24,6 +24,7 @@ app.get('/getChildBuilds', wrap(require('./getChildBuilds')));
 app.get('/getDashboardBuildInfo', wrap(require('./getDashboardBuildInfo')));
 app.get('/getData', wrap(require('./getData')));
 app.get('/getErrorInOutput', wrap(require('./getErrorInOutput')));
+app.get('/getHistoricalData',wrap(require('./getHistoricalData')));
 app.get('/getHistoryPerTest', wrap(require('./getHistoryPerTest')));
 app.get('/getJenkins', wrap(require('./getJenkins')));
 app.get('/getLastBuildInfo', wrap(require('./getLastBuildInfo')));

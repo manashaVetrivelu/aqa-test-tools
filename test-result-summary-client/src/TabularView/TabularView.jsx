@@ -361,9 +361,12 @@ export default class TabularView extends Component {
             return 'N/A';
         } else if (field === 'buildUrl') {
             let urls = {};
-            if (val['testBuildUrl'] && val['baselineBuildUrl']) {
+            if (val['testBuildUrl'] && val['baselineBuildUrl'] && val['testBenchmarkName'] && val['testPlatform']) {
                 urls.testBuildUrl = val['testBuildUrl'];
                 urls.baselineBuildUrl = val['baselineBuildUrl'];
+                urls.testBenchmarkName = val['testBenchmarkName'];
+                urls.testBenchmarkVariant = val['testBenchmarkVariant'];
+                urls.testPlatform = val['testPlatform'];
             } else if (val['testBuildUrl']) {
                 urls.testBuildUrl = val['testBuildUrl'];
             } else if (val['baselineBuildUrl']) {
@@ -386,7 +389,13 @@ export default class TabularView extends Component {
                 'testID=' +
                 urls.testBuildUrl +
                 '&baselineID=' +
-                urls.baselineBuildUrl;
+                urls.baselineBuildUrl +
+                '&benchmarkName=' +
+                urls.testBenchmarkName +
+                '&benchmarkVariant='+
+                urls.testBenchmarkVariant+
+                '&testPlatform=' +
+                urls.testPlatform;
         } else if (urls.hasOwnProperty('testBuildUrl')) {
             url += 'testID=' + urls.testBuildUrl;
         } else if (urls.hasOwnProperty('baselineBuildUrl')) {
@@ -650,6 +659,9 @@ export default class TabularView extends Component {
                     testResultObject.aggregateInfo[index].metrics[metric]
                         .statValues.mean,
                 testJdkDate: testResultObject.jdkDate,
+                testBenchmarkName: testResultObject.aggregateInfo[index].benchmarkName,
+                testBenchmarkVariant: testResultObject.aggregateInfo[index].benchmarkVariant,
+                testPlatform: getInfoFromBuildName(testResultObject.buildName).platform,
                 testCI: testResultObject.aggregateInfo[index].metrics[metric]
                     .statValues.CI,
                 testSdkResource: testResultObject.sdkResource,
@@ -664,6 +676,9 @@ export default class TabularView extends Component {
                     testResultObject.aggregateInfo[index].metrics[metric]
                         .statValues.mean,
                 baselineJdkDate: testResultObject.jdkDate,
+                baselineBenchmarkName: testResultObject.aggregateInfo[index].benchmarkName,
+                baselineBenchmarkVariant: testResultObject.aggregateInfo[index].benchmarkVariant,
+                baselinePlatform: getInfoFromBuildName(testResultObject.buildName).platform,
                 baselineCI:
                     testResultObject.aggregateInfo[index].metrics[metric]
                         .statValues.CI,

@@ -11,6 +11,7 @@ import { TestCompare } from './TestCompare/';
 import { ThirdPartyAppView } from './ThirdPartyAppView/';
 import { PerfCompare } from './PerfCompare/';
 import { TabularView } from './TabularView/';
+import { Graph } from './Graph/';
 import {
     AllTestsInfo,
     BuildDetail,
@@ -210,6 +211,10 @@ export default class App extends Component {
                                     <Route
                                         path="/tabularView"
                                         component={TabularView}
+                                    />
+                                    <Route
+                                        path="/graph"
+                                        component={Graph}
                                     />
                                     <Route
                                         path="/buildDetail"

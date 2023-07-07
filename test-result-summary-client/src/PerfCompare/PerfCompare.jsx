@@ -37,6 +37,9 @@ export default class PerfCompare extends Component {
         inputURL: {
             baselineID: '',
             testID: '',
+            testPlatform: '',
+            benchmarkName: '',
+            benchmarkVariant: '',
         },
         selectedRuns: {
             baselineServerURL: '',
@@ -484,6 +487,21 @@ export default class PerfCompare extends Component {
         }
     };
 
+    handleLink() {
+        // Calling PerfCompare with Links
+        let url = 'graph?';
+        url +=
+                'platform=' +
+                this.state.inputURL.testPlatform +
+                '&benchmarkName=' +
+                this.state.inputURL.benchmarkName +
+                '&benchmarkVariant=' +
+                this.state.inputURL.benchmarkVariant;
+
+        const win = window.open(url, '_blank');
+        win.focus();
+    }
+
     handleGenerateTable = async () => {
         this.setState({
             progress: 80,
@@ -769,6 +787,11 @@ export default class PerfCompare extends Component {
                     />
                     <Row type="flex" justify="space-around" align="middle">
                         <h1>Performance Comparison Generated</h1>
+                    </Row>
+                    <Row type="flex" justify="space-around" align="middle">
+                        <Button type="primary" onClick={() =>
+                            this.handleLink()
+                        }>Graph</Button>
                     </Row>
                     <Row type="flex" justify="space-around" align="middle">
                         <h2>

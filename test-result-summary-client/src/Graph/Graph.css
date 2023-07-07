@@ -1,0 +1,10 @@
+.columnGraph {
+    float: left;
+    width: 25%;
+    font: 30px;
+}
+
+#header {
+    font-size: 20px;
+    font-family: 'arial'
+}
